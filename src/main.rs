@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
-fn costs_from_origin(n: usize, a: Vec<i32>) -> Vec<i32> {
-    let mut costs = (0..n)
+fn costs_from_origin(intersection_number: usize, shortcuts: Vec<i32>) -> Vec<i32> {
+    let mut costs = (0..intersection_number)
         .map(|i| if i == 0 { 0 } else { -1 })
         .collect::<Vec<_>>();
     let mut intersections = VecDeque::from([1]);
@@ -10,7 +10,7 @@ fn costs_from_origin(n: usize, a: Vec<i32>) -> Vec<i32> {
         // Intersection at cost 1
         let prev = i - 1;
         let next = i + 1;
-        let ai = a[i - 1] as usize;
+        let shortcut = shortcuts[i - 1] as usize;
 
         // Cost from intersection 1
         let cost = 1 + costs[i - 1];
@@ -21,14 +21,14 @@ fn costs_from_origin(n: usize, a: Vec<i32>) -> Vec<i32> {
             intersections.push_back(prev);
         }
 
-        if next <= n && (costs[next - 1] < 0 || costs[next - 1] > cost) {
+        if next <= intersection_number && (costs[next - 1] < 0 || costs[next - 1] > cost) {
             costs[next - 1] = cost;
             intersections.push_back(next);
         }
 
-        if costs[ai - 1] < 0 || costs[ai - 1] > cost {
-            costs[ai - 1] = cost;
-            intersections.push_back(ai);
+        if costs[shortcut - 1] < 0 || costs[shortcut - 1] > cost {
+            costs[shortcut - 1] = cost;
+            intersections.push_back(shortcut);
         }
     }
 
@@ -40,21 +40,21 @@ fn main() {
     std::io::stdin()
         .read_line(&mut s)
         .expect("fail to read_line");
-    let n: usize = s.trim().parse().expect("invalid n");
+    let intersection_number: usize = s.trim().parse().expect("invalid n");
 
     s.clear();
     std::io::stdin()
         .read_line(&mut s)
         .expect("fail to read_line");
-    let a = s
+    let shortcuts = s
         .trim()
         .split(" ")
         .map(|a| a.parse().expect("invalid ai"))
         .collect::<Vec<i32>>();
 
-    assert!(a.len() == n);
+    assert!(shortcuts.len() == intersection_number);
 
-    costs_from_origin(n, a)
+    costs_from_origin(intersection_number, shortcuts)
         .into_iter()
         .for_each(|c| print!("{} ", c));
 }
